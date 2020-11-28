@@ -1,4 +1,4 @@
-package com.jambit.database
+package com.jambit
 
 trait CborSerializable
 trait JsonSerializable
