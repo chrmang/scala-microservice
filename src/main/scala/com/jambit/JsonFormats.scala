@@ -1,6 +1,7 @@
 package com.jambit
 
 //#json-formats
+import com.jambit.database.DatabaseUserRegistry.{CreateUserEvent, DeleteUserEvent}
 import spray.json.DefaultJsonProtocol
 
 object JsonFormats  {

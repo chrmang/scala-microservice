@@ -4,4 +4,6 @@
 # ignore compiled files
 target/
 
-*.log
+# ignore databbase files
+journal/
+snapshots/

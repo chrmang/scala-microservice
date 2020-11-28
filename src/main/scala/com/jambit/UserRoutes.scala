@@ -1,20 +1,16 @@
 package com.jambit
 
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
-
-import scala.concurrent.Future
-import com.jambit.memory.MemoryUserRegistry._
-import akka.actor.typed.ActorRef
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.AskPattern._
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.util.Timeout
-import com.jambit.memory.MemoryUserRegistry
+import scala.concurrent.Future
 
 //#import-json-formats
 //#user-routes-class
-class UserRoutes(userRegistry: ActorRef[MemoryUserRegistry.Command])(implicit val system: ActorSystem[_]) {
+class UserRoutes(pathName: String, userRegistry: ActorRef[Command])(implicit val system: ActorSystem[_]) {
 
   //#user-routes-class
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -37,7 +33,7 @@ class UserRoutes(userRegistry: ActorRef[MemoryUserRegistry.Command])(implicit va
   //#users-get-post
   //#users-get-delete
   val userRoutes: Route =
-    pathPrefix("memory"/"users") {
+    pathPrefix(pathName / "users") {
       concat(
         //#users-get-delete
         pathEnd {

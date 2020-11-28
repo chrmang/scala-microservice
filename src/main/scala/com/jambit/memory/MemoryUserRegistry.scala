@@ -1,20 +1,11 @@
 package com.jambit.memory
 
 //#user-registry-actor
-import akka.actor.typed.{ActorRef, Behavior}
+import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
-import com.jambit.{ActionPerformed, User, Users}
+import com.jambit._
 
 object MemoryUserRegistry {
-
-  // actor protocol
-  sealed trait Command
-  final case class GetUsers(replyTo: ActorRef[Users]) extends Command
-  final case class CreateUser(user: User, replyTo: ActorRef[ActionPerformed]) extends Command
-  final case class GetUser(name: String, replyTo: ActorRef[GetUserResponse]) extends Command
-  final case class DeleteUser(name: String, replyTo: ActorRef[ActionPerformed]) extends Command
-
-  final case class GetUserResponse(maybeUser: Option[User])
 
   def apply(): Behavior[Command] = registry(Set.empty)
 

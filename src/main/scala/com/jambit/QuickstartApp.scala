@@ -4,8 +4,9 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
+import com.jambit.database.DatabaseUserRegistry
 import com.jambit.memory.MemoryUserRegistry
-
+import akka.http.scaladsl.server.Directives._
 import scala.util.Failure
 import scala.util.Success
 
@@ -30,11 +31,14 @@ object QuickstartApp {
   def main(args: Array[String]): Unit = {
     //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>
-      val userRegistryActor = context.spawn(MemoryUserRegistry(), "UserRegistryActor")
-      context.watch(userRegistryActor)
+      val databaseUserRegistryActor = context.spawn(DatabaseUserRegistry("uniqueId"), "DatabaseUserRegistryActor")
+      context.watch(databaseUserRegistryActor)
+      val memoryUserRegistryActor = context.spawn(MemoryUserRegistry(), "MemoryUserRegistryActor")
+      context.watch(memoryUserRegistryActor)
 
-      val routes = new UserRoutes(userRegistryActor)(context.system)
-      startHttpServer(routes.userRoutes)(context.system)
+      val databaseRoutes = new UserRoutes("database", databaseUserRegistryActor)(context.system)
+      val memoryRoutes = new UserRoutes("memory", memoryUserRegistryActor)(context.system)
+      startHttpServer(concat(databaseRoutes.userRoutes, memoryRoutes.userRoutes))(context.system)
 
       Behaviors.empty
     }

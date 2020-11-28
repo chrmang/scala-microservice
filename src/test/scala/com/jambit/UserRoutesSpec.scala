@@ -26,7 +26,7 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
   // but we could "mock" it by implementing it in-place or by using a TestProbe
   // created with testKit.createTestProbe()
   val userRegistry = testKit.spawn(MemoryUserRegistry())
-  lazy val routes = new UserRoutes(userRegistry).userRoutes
+  lazy val routes = new UserRoutes("test", userRegistry).userRoutes
 
   // use the json formats to marshal and unmarshall objects in the test
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -35,9 +35,9 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
 
   //#actual-test
   "UserRoutes" should {
-    "return no users if no present (GET /memory//users)" in {
+    "return no users if no present (GET /test/users)" in {
       // note that there's no need for the host part in the uri:
-      val request = HttpRequest(uri = "/memory/users")
+      val request = HttpRequest(uri = "/test/users")
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
@@ -52,12 +52,12 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
     //#actual-test
 
     //#testing-post
-    "be able to add users (POST /memory/users)" in {
+    "be able to add users (POST /test/users)" in {
       val user = User("Kapi", 42, "jp")
       val userEntity = Marshal(user).to[MessageEntity].futureValue // futureValue is from ScalaFutures
 
       // using the RequestBuilding DSL:
-      val request = Post("/memory/users").withEntity(userEntity)
+      val request = Post("/test/users").withEntity(userEntity)
 
       request ~> routes ~> check {
         status should ===(StatusCodes.Created)
@@ -71,9 +71,9 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
     }
     //#testing-post
 
-    "be able to remove users (DELETE /memory/users)" in {
+    "be able to remove users (DELETE /test/users)" in {
       // user the RequestBuilding DSL provided by ScalatestRouteSpec:
-      val request = Delete(uri = "/memory/users/Kapi")
+      val request = Delete(uri = "/test/users/Kapi")
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
