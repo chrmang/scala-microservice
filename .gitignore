@@ -1,2 +1,7 @@
-*.class
+# ignore IntelliJ files
+.idea/
+
+# ignore compiled files
+target/
+
 *.log
