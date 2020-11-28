@@ -7,6 +7,8 @@ import akka.http.scaladsl.server.Route
 import com.jambit.database.DatabaseUserRegistry
 import com.jambit.memory.MemoryUserRegistry
 import akka.http.scaladsl.server.Directives._
+import org.slf4j.LoggerFactory
+
 import scala.util.Failure
 import scala.util.Success
 
@@ -29,6 +31,9 @@ object QuickstartApp {
   }
   //#start-http-server
   def main(args: Array[String]): Unit = {
+    // eager start of slf4j to avoid warnings
+    LoggerFactory.getLogger("")
+
     //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>
       val databaseUserRegistryActor = context.spawn(DatabaseUserRegistry("uniqueId"), "DatabaseUserRegistryActor")
