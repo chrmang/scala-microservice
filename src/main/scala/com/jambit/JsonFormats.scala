@@ -1,7 +1,5 @@
 package com.jambit
 
-import com.jambit.UserRegistry.ActionPerformed
-
 //#json-formats
 import spray.json.DefaultJsonProtocol
 

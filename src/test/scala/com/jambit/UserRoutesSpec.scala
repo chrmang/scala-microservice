@@ -6,8 +6,9 @@ import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
+import com.jambit.memory.MemoryUserRegistry
+import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ Matchers, WordSpec }
 
 //#set-up
 class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with ScalatestRouteTest {
@@ -24,7 +25,7 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
   // We use the real UserRegistryActor to test it while we hit the Routes,
   // but we could "mock" it by implementing it in-place or by using a TestProbe
   // created with testKit.createTestProbe()
-  val userRegistry = testKit.spawn(UserRegistry())
+  val userRegistry = testKit.spawn(MemoryUserRegistry())
   lazy val routes = new UserRoutes(userRegistry).userRoutes
 
   // use the json formats to marshal and unmarshall objects in the test
@@ -34,9 +35,9 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
 
   //#actual-test
   "UserRoutes" should {
-    "return no users if no present (GET /users)" in {
+    "return no users if no present (GET /memory//users)" in {
       // note that there's no need for the host part in the uri:
-      val request = HttpRequest(uri = "/users")
+      val request = HttpRequest(uri = "/memory/users")
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
@@ -51,12 +52,12 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
     //#actual-test
 
     //#testing-post
-    "be able to add users (POST /users)" in {
+    "be able to add users (POST /memory/users)" in {
       val user = User("Kapi", 42, "jp")
       val userEntity = Marshal(user).to[MessageEntity].futureValue // futureValue is from ScalaFutures
 
       // using the RequestBuilding DSL:
-      val request = Post("/users").withEntity(userEntity)
+      val request = Post("/memory/users").withEntity(userEntity)
 
       request ~> routes ~> check {
         status should ===(StatusCodes.Created)
@@ -70,9 +71,9 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
     }
     //#testing-post
 
-    "be able to remove users (DELETE /users)" in {
+    "be able to remove users (DELETE /memory/users)" in {
       // user the RequestBuilding DSL provided by ScalatestRouteSpec:
-      val request = Delete(uri = "/users/Kapi")
+      val request = Delete(uri = "/memory/users/Kapi")
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
