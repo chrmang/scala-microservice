@@ -1,6 +1,5 @@
 package com.jambit.memory
 
-//#user-registry-actor
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import com.jambit._
@@ -25,4 +24,3 @@ object MemoryUserRegistry {
         registry(users.filterNot(_.name == name))
     }
 }
-//#user-registry-actor

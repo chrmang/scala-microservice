@@ -13,9 +13,8 @@ import org.slf4j.LoggerFactory
 
 import scala.util.{Failure, Success}
 
-//#main-class
 object QuickstartApp {
-  //#start-http-server
+
   private def startHttpServer(routes: Route)(implicit system: ActorSystem[_]): Unit = {
     // Akka HTTP still needs a classic ActorSystem to start
     import system.executionContext
@@ -31,12 +30,10 @@ object QuickstartApp {
     }
   }
 
-  //#start-http-server
   def main(args: Array[String]): Unit = {
     // eager start of slf4j to avoid warnings
     LoggerFactory.getLogger("")
 
-    //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>
       // standard actors
       val databaseUserRegistryActor = context.spawn(DatabaseUserRegistry("uniqueId"), "DatabaseUserRegistryActor")
@@ -63,8 +60,5 @@ object QuickstartApp {
     val system = ActorSystem[Nothing](rootBehavior, "ClusterSystem")
     val cluster = Cluster(system)
     cluster.manager ! Join(cluster.selfMember.address)
-    //#server-bootstrapping
   }
 }
-
-//#main-class
