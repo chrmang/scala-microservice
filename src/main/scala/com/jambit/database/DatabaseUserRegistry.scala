@@ -8,9 +8,9 @@ import com.jambit._
 object DatabaseUserRegistry {
 
   // actor events
-  sealed trait Event
-  final case class CreateUserEvent(user: User) extends Event with CborSerializable
-  final case class DeleteUserEvent(name: String) extends Event with CborSerializable
+  sealed trait Event extends CborSerializable
+  final case class CreateUserEvent(user: User) extends Event
+  final case class DeleteUserEvent(name: String) extends Event
 
   // actor state
   final case class State(users: Set[User])
