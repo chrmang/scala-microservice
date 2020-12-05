@@ -26,7 +26,7 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
   // but we could "mock" it by implementing it in-place or by using a TestProbe
   // created with testKit.createTestProbe()
   val userRegistry = testKit.spawn(MemoryUserRegistry())
-  lazy val routes = new UserRoutes("test", userRegistry).userRoutes
+  lazy val routes = new UserRoutes("test", userRegistry, None).userRoutes
 
   // use the json formats to marshal and unmarshall objects in the test
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._

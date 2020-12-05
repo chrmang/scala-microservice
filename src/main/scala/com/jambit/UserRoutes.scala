@@ -10,7 +10,8 @@ import scala.concurrent.Future
 
 //#import-json-formats
 //#user-routes-class
-class UserRoutes(pathName: String, userRegistry: ActorRef[Command])(implicit val system: ActorSystem[_]) {
+class UserRoutes(pathName: String, userRegistry: ActorRef[Command],
+                 updateableRegistry:Option[ActorRef[CommandWithUpdate]])(implicit val system: ActorSystem[_]) {
 
   //#user-routes-class
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -61,6 +62,16 @@ class UserRoutes(pathName: String, userRegistry: ActorRef[Command])(implicit val
                 }
               }
               //#retrieve-user-info
+            },
+            put {
+              if(updateableRegistry.isDefined)
+                entity(as[User]) { user =>
+                  onSuccess(updateableRegistry.get.ask(replyTo => UpdateUser(user, replyTo))) { performed =>
+                    complete((StatusCodes.OK, performed))
+                  }
+                }
+              else
+                complete(StatusCodes.NotFound)
             },
             delete {
               //#users-delete-logic
