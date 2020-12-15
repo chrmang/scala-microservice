@@ -18,7 +18,7 @@ The REST API is simple:
 - delete user object
 - read all user objects
 
-See [Postman collection](./scala-microservice.postman_collection.json) for available requests
+See [Postman collection](./scala-microservice.postman_collection.json) for available requests.
 
 
 In memory storage
@@ -48,3 +48,23 @@ If the actor with the same `PersistenceId` is created, all events are read from 
 __For easy testing, a LevelDB database is used. The data is stored in the `journal` folder. Don't use this setup for
 production!__
 
+
+Cluster singleton
+-----------------
+
+The package `com.jambit.singleton` contains two actors: `UsserActivity`and `UserCoordinator`. The `UserCoordinator` is 
+a cluster singleton. It's responsible for coordinating `UserActivity` actors.
+At startup time, the `UserCoordinator` restores all Usernames from its persistent state with CQRS. Every Username is 
+also a name of a child actor of`UserActivity`. Like the `UserCoordinator` actor, every restored `UserActivity` actor 
+gets its persistent state from the database.
+
+The difference to 'database storage' is, every `User` object has its own actor for state handling. If you have only one 
+big list of `User`objects, it's difficult to split the list and distribute the parts in a cluster. With many small 
+actors, it's easier to implement this. The cluster singleton in this example is to show you a way to have only one 
+coordinating instance in a cluster. The singleton is instantiated at the oldest node in the cluster. So you can not use
+this method to have only one `UserActivity` actor per Username. All actors wil be created on only one node.
+
+In a real cluster setup, you might also have a NodeCoordinator. In this case, the NodeCoordinator manages all 
+`UserActivity` actors on its node. The `UserCoordinator` only manages a list of node in the cluster. With this list, the
+NodeCoordinator actors can manage sharding of `UserActivity` actors to all nodes and (re-)balancing the amount of 
+`UserActivity` on each node.
